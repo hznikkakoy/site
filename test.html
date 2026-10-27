@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+<meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Тест — Классник</title>
+    <link rel="stylesheet" href="style.css"><link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        .test-page {
+            max-width: 900px;
+            margin: auto;
+            padding: 28px 22px 50px
+        }
+
+        .test-card {
+            background: #fff;
+            border-radius: 23px;
+            box-shadow: var(--shadow);
+            padding: 22px
+        }
+
+        .test-head {
+            background: #eaf7ff;
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 15px
+        }
+
+        .test-head h1 {
+            margin: 0;
+            font-size: 29px
+        }
+
+        .test-head p {
+            margin: 4px 0;
+            color: #687986
+        }
+
+        .q-card {
+            border: 1px solid #e6edf1;
+            border-radius: 17px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fbfdff
+        }
+
+        .q-card h3 {
+            font-size: 16px;
+            margin: 0 0 10px
+        }
+
+        .answer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 10px;
+            border-radius: 11px;
+            margin: 5px 0;
+            background: #fff;
+            border: 1px solid #e2e9ee;
+            cursor: pointer
+        }
+
+        .answer:hover {
+            background: #f3faff
+        }
+
+        .result {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 15px;
+            background: #eaf8f1;
+            font-weight: 800
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 10px;
+            color: #2779bd;
+            font-weight: 800
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="nav"><a class="logo" href="index.html"><span
+                    style="font-size:34px">🦉</span><span>Классник</span></a>
+            <div class="nav-links"><a href="index.html">Главная</a><a class="active" href="dashboard.html">Кабинет</a>
+            </div>
+        </nav>
+    </header>
+    <main class="test-page"><a class="back" href="dashboard.html">← Назад в кабинет</a>
+        <section class="test-card">
+            <div id="content">Загрузка теста…</div>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+    <script src="supabase-config.js"></script>
+<script src="app.js"></script>
+    <script>
+const esc = s => String(s ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+const sb = window.klassnikSb, id = new URLSearchParams(location.search).get('id'), content = document.querySelector('#content');
+function head(t) { return `<div class="test-head"><h1>${esc(t.title)}</h1><p>${esc(t.subject)}${t.description ? ' · ' + esc(t.description) : ''}</p></div>` }
+function review(t, r) {
+  const d = Object.fromEntries((r.details || []).map(x => [x.id, x])), pct = Math.round(r.score / Math.max(r.total, 1) * 100);
+  content.innerHTML = head(t) + `<div class="result score">🌟 Ты набрал ${r.score} из ${r.total} баллов (${pct}%)<div class="legend"><span class="ok">✓ верно</span><span class="bad">✗ ошибка</span></div></div>` + t.questions.map((q, i) => {
+    const x = d[q.id] || {};
+    const body = q.qtype === 'open' ? `<div class="options"><div class="answer ${x.ok ? 'ok' : 'bad'}">Твой ответ: ${esc(x.given || 'нет ответа')}</div>${x.ok ? '' : `<div class="answer ok">Правильный ответ: ${esc(x.correct)}</div>`}</div>`
+      : `<div class="options">${(q.options || []).map(o => `<div class="answer ${o === x.correct ? 'ok' : o === x.given ? 'bad' : ''}">${esc(o)}</div>`).join('')}</div>`;
+    return `<div class="q-card"><h3>${i + 1}. ${esc(q.question_text)}</h3>${body}</div>`;
+  }).join('') + '<a class="primary" style="display:block;text-align:center;text-decoration:none;margin-top:14px" href="dashboard.html">В кабинет →</a>';
+  window.scrollTo({ top: 0 });
+}
+async function run() {
+  try {
+    if (!sb || !id) { content.innerHTML = '<div class="result">Тест не найден.</div>'; return }
+    const { data: { user } } = await sb.auth.getUser(); if (!user) { location.replace('login.html'); return }
+    const [tr, ar] = await Promise.all([
+      sb.from('tests').select('id,title,subject,description,questions(id,question_text,options,sort_order,qtype)').eq('id', id).single(),
+      sb.from('attempts').select('id').eq('test_id', id).eq('student_id', user.id).limit(1)]);
+    const t = tr.data; if (tr.error || !t) { content.innerHTML = '<div class="result">Тест не найден или ещё не опубликован.</div>'; return }
+    t.questions.sort((a, b) => a.sort_order - b.sort_order);
+    const showDone = async () => { const { data: rv, error } = await sb.rpc('my_review', { p_test: t.id }); if (error || !rv) { content.innerHTML = '<div class="result">Результат сохранён. Загляни в кабинет 🌟</div>'; return } review(t, rv) };
+    if (ar.data?.length) { await showDone(); return }
+    content.innerHTML = head(t) + `<form id="quiz">${t.questions.map((q, i) => `<div class="q-card"><h3>${i + 1}. ${esc(q.question_text)}</h3>${q.qtype === 'open' ? `<input class="open-answer" required maxlength="200" autocomplete="off" name="q_${q.id}" placeholder="Напиши ответ здесь">` : `<div class="options">${(q.options || []).map(o => `<label class="answer"><input required type="radio" name="q_${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join('')}</div>`}</div>`).join('')}<button class="primary" style="width:100%;margin-top:12px" type="submit">Завершить тест</button></form><div id="result"></div>`;
+    document.querySelector('#quiz').onsubmit = async e => {
+      e.preventDefault(); const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true; const answers = {};
+      t.questions.forEach(q => { answers[q.id] = q.qtype === 'open' ? (e.target.elements['q_' + q.id].value || '').trim() : (document.querySelector('input[name="q_' + q.id + '"]:checked')?.value || '') });
+      const { error: er } = await sb.rpc('submit_attempt', { p_test: t.id, p_answers: answers });
+      if (er) { btn.disabled = false; document.querySelector('#result').innerHTML = '<div class="result">Не получилось сохранить результат. Попробуй ещё раз.</div>'; return }
+      await showDone();
+    };
+  } catch (e) { content.innerHTML = '<div class="result">Что-то пошло не так. Обнови страницу.</div>' }
+}
+run();
+</script>
+</body>
+
+</html>

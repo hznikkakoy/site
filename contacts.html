@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+<meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Контакты — Классник</title>
+    <link rel="stylesheet" href="style.css"><link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="nav"><a class="logo" href="index.html"><svg class="brand-owl" viewBox="0 0 80 80"
+                    aria-label="Логотип совы" role="img">
+                    <defs>
+                        <linearGradient id="owlHead" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#b87950" />
+                            <stop offset="1" stop-color="#855039" />
+                        </linearGradient>
+                        <linearGradient id="owlChest" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#d69a70" />
+                            <stop offset="1" stop-color="#a76648" />
+                        </linearGradient>
+                    </defs>
+                    <path
+                        d="M17 28C12 22 9 14 11 8c7 2 13 6 17 12 5-2 10-3 14-3s9 1 14 3c4-6 10-10 17-12 2 6-1 14-6 20 4 6 5 13 4 20-2 15-14 24-29 24S15 63 13 48c-1-7 0-14 4-20Z"
+                        fill="url(#owlHead)" stroke="#71442f" stroke-width="2" />
+                    <path d="M20 38c0-12 7-21 20-21s20 9 20 21-8 24-20 24-20-12-20-24Z" fill="#f8e5c7" />
+                    <ellipse cx="30" cy="37" rx="10" ry="12" fill="#fff" />
+                    <ellipse cx="50" cy="37" rx="10" ry="12" fill="#fff" />
+                    <circle cx="31" cy="38" r="5.5" fill="#2e2927" />
+                    <circle cx="49" cy="38" r="5.5" fill="#2e2927" />
+                    <circle cx="33" cy="36" r="1.8" fill="#fff" />
+                    <circle cx="51" cy="36" r="1.8" fill="#fff" />
+                    <path d="M40 41l7 4-7 7-7-7z" fill="#f3b51b" stroke="#b77708" stroke-width="1.5" />
+                    <path d="M27 53c4 5 9 7 13 7s9-2 13-7c-3 9-8 14-13 14s-10-5-13-14Z" fill="url(#owlChest)"
+                        opacity=".9" />
+                    <path d="M16 51c3 2 7 4 11 4M64 51c-3 2-7 4-11 4" stroke="#7b4b35" stroke-width="4"
+                        stroke-linecap="round" opacity=".8" />
+                </svg><span>Классник</span></a>
+            <div class="nav-links"><a class="" href="index.html">Главная</a><a class="" href="teacher.html">Об
+                    учителе</a><a class="" href="prices.html">Цены</a><a class="active"
+                    href="contacts.html">Контакты</a><a class="login-link" href="login.html">Войти</a><a
+                    class="login-link signup" href="login.html">Записаться</a></div><button class="menu-toggle"
+                type="button">Меню</button>
+            <div class="mobile-menu"><a href="index.html">Главная</a><a href="teacher.html">Об учителе</a><a
+                    href="prices.html">Цены</a><a href="contacts.html">Контакты</a><a href="login.html">Личный
+                    кабинет</a></div>
+        </nav>
+    </header>
+    <main class="page">
+        <div class="section-title reveal">
+            <h2>Свяжитесь с нами</h2>
+            <p>Мы всегда рады ответить на ваши вопросы</p>
+        </div>
+        <section class="contact-grid">
+            <div class="form-card reveal">
+                <form id="contactForm">
+<label for="name">Ваше имя</label><input id="name" required placeholder="Как к вам обращаться?">
+<label for="email">Email</label><input id="email" type="email" required placeholder="Ваш email">
+<label for="grade">Класс</label><select id="grade" required><option value="">Выбор класса</option><option value="Дошкольная группа">Дошкольная группа</option><option value="1 класс">1 класс</option><option value="2 класс">2 класс</option><option value="3 класс">3 класс</option><option value="4 класс">4 класс</option></select>
+<label for="message">Сообщение</label><textarea id="message" required placeholder="Напишите ваше сообщение..."></textarea>
+<button class="primary" type="submit" style="width:100%;max-width:none;margin-top:16px">Отправить сообщение</button>
+<p id="formMessage" class="hint"></p>
+</form>
+            </div>
+            <div class="contact-panel reveal">
+                <div class="contact-panel-top">
+                    <h2>Наши контакты</h2>
+                    <div class="contact-info">
+                        <div>Онлайн по всей России</div>
+                        <div>Почта: hello@classnik.ru</div>
+                        <div class="contact-vk"><a href="#" aria-label="ВКонтакте">VK — ВКонтакте</a></div>
+                    </div>
+                </div>
+                <div class="contact-art"><img src="contacts-owl.jpeg" alt="Сова с конвертом"></div>
+            </div>
+        </section>
+    </main>
+    <footer>Классник — онлайн-школа для детей. © 2026</footer>
+    
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+</body>
+
+</html>
